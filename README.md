@@ -22,3 +22,7 @@ We want our app to:
   
 * Suggestions about the surroundings (restaurants, places to visit, etc.)
   
+
+## WHAT WE WANT TO USE
+
+We think about coding this solution in C# and using Dijkstra's Algorithm.
