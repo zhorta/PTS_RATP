@@ -1,0 +1,14 @@
+﻿<Properties StartupConfiguration="{F873BA39-E836-4D95-B507-5D51A3D3108B}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Commuteasy/Program.cs">
+    <Files>
+      <File FileName="Commuteasy/Program.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.Commuteasy PreferredExecutionTarget="MonoDevelop.Default" FirstBuild="True" />
+</Properties>
