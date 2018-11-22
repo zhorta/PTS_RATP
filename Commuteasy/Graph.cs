@@ -6,7 +6,7 @@ namespace Commuteasy
     public class Graph
     {
         List<Node> nodes;
-        int[,] adjacencyMatrix;
+        public int[,] adjacencyMatrix;
 
         public int [,] BuildAdjMatrix(List<Node> nodes){
             int[,] matrix = new int [nodes.Count, nodes.Count];
@@ -21,11 +21,15 @@ namespace Commuteasy
             foreach(Node node in nodes){
                 foreach(int key in node.neighbours.Keys){
                     matrix[node.id, key] = node.neighbours[key];
-                    Console.WriteLine(node.neighbours[key]);
+                    //Console.WriteLine(node.neighbours[key]);
                 }
             }
 
             return matrix;
+        }
+
+        public int GetNbOfNodes(){
+            return nodes.Count;
         }
 
         public Graph(List<Node> nodes)
@@ -39,7 +43,7 @@ namespace Commuteasy
             for (int i = 0; i < adjacencyMatrix.GetLength(0); i++){
                 for (int j = 0; j < adjacencyMatrix.GetLength(1); j++){
                     if(adjacencyMatrix[i,j] == int.MaxValue){
-                        Console.Write("infty" + " ");
+                        Console.Write("+∞" + " ");
                     }
                     else{
                         Console.Write(adjacencyMatrix[i, j] + " ");
