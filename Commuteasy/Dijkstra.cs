@@ -15,7 +15,7 @@ namespace Commuteasy
             //path = new List<Node>();
         }
 
-        public int[] FromVisited(List<int> visited){ //Function that finds the shortest path from a visited node to an unvisited node
+        /*public int[] FromVisited(List<int> visited){ //Function that finds the shortest path from a visited node to an unvisited node
             int minDist = int.MaxValue;
             int selectedVertex = -1;
             int destinationVertex = -1;
@@ -45,54 +45,117 @@ namespace Commuteasy
 
 
             return toReturn;
+        }*/
+
+        public object[] FromVisited(List<Node> visited)
+        { //Function that finds the shortest path from a visited node to an unvisited node
+            int minDist = int.MaxValue;
+            Node selectedVertex = new Node(-1);
+            Node destinationVertex = new Node(-1);
+            object[] toReturn = new object[3];
+            List<int> visitedIds = new List<int>();
+
+            foreach(Node vertexId in visited){
+                //Console.WriteLine(vertexId.id);
+                visitedIds.Add(vertexId.id);
+            }
+
+
+            if (visited.Count > 0)
+            {
+
+                foreach (Node vertex in visited)
+                {
+                    for (int j = 0; j < graph.adjacencyMatrix.GetLength(0); j++)
+                    {
+                        if (!visitedIds.Contains(j) && graph.adjacencyMatrix[vertex.id, j] != int.MaxValue && graph.adjacencyMatrix[vertex.id, j] + vertex.distToNode < minDist)
+                        {
+                            minDist = graph.adjacencyMatrix[vertex.id, j] + vertex.distToNode ;
+                            destinationVertex = graph.nodes[j];
+                            selectedVertex = vertex;
+                            destinationVertex.distToNode = minDist;// + selectedVertex.distToNode;
+                            //Console.WriteLine("Dist To Node " + destinationVertex.id + " = " + destinationVertex.distToNode);
+                        }
+                    }
+
+                }
+            }
+
+            toReturn[0] = minDist;
+            toReturn[1] = selectedVertex;
+            toReturn[2] = destinationVertex;
+
+
+
+            return toReturn;
         }
 
-        public List<int> ShortestPath(int start, int end){
-            List<int> path = new List<int>();
-            List<int> visited = new List<int>();
+        public List<Node> ShortestPath(Node start, Node end)
+        {
+            List<Node> path = new List<Node>();
+            List<Node> visited = new List<Node>();
 
             bool reachedTheEnd = false;
 
             int minDist = int.MaxValue;
-            int totalDist = 0;
+            int distToNode = 0;
 
-            int currentVertex = start;
-            int nextVertex = -1;
+            Node currentVertex = start;
+            Node nextVertex = new Node(-1);
 
-            while(!reachedTheEnd){
+            while (!reachedTheEnd)
+            {
                 
                 visited.Add(currentVertex);
-                int[] distFromVisited = FromVisited(visited); //index 0 = minDist, index 1 = selectedVertex, index 2 = destinationVertex
 
-                if(distFromVisited[0]<minDist){
-                    minDist = distFromVisited[0];
-                    nextVertex = distFromVisited[2];
-                    currentVertex = distFromVisited[1];
+                object[] distFromVisited = FromVisited(visited); //index 0 = minDist, index 1 = selectedVertex, index 2 = destinationVertex
+
+                if ((int)distFromVisited[0] < minDist)
+                {
+                    minDist = (int)distFromVisited[0];
+                    nextVertex = (Node)distFromVisited[2];
+                    currentVertex = (Node)distFromVisited[1];
                 }
 
 
                 Console.WriteLine("Visited: ");
-                foreach(int vertex in visited){
-                    Console.Write(vertex + ", ");
+                foreach (Node vertex in visited)
+                {
+                    Console.Write(vertex.id + ", ");
                 }
                 Console.WriteLine();
 
 
-                Console.Write("Current vertex: " + currentVertex);
+                Console.Write("Current vertex: " + currentVertex.id);
 
-                totalDist += minDist;
-                path.Add(currentVertex);
+                //path.Add(currentVertex);
+                nextVertex.predecessor = currentVertex;
                 currentVertex = nextVertex;
 
-                Console.WriteLine(" — Next vertex: " + currentVertex);
+
+                Console.WriteLine(" — Next vertex: " + currentVertex.id);
+                Console.WriteLine("Distance to next vertex: " + currentVertex.distToNode);
                 minDist = int.MaxValue;
 
-                if(currentVertex == end){
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+
+                if (currentVertex.id == end.id)
+                {
                     reachedTheEnd = true;
                     path.Add(currentVertex);
-                } 
-            }
+                    Console.WriteLine("Total distance to reach " + end.id + " from " + start.id + ": " + currentVertex.distToNode);
+                }
 
+                
+            }
+            Node test = currentVertex;
+
+            while(test.predecessor != null){
+                path.Add(test.predecessor);
+                test = test.predecessor;
+            }
 
             return path;
         }

@@ -5,7 +5,7 @@ namespace Commuteasy
 {
     public class Graph
     {
-        List<Node> nodes;
+        public List<Node> nodes;
         public int[,] adjacencyMatrix;
 
         public int [,] BuildAdjMatrix(List<Node> nodes){

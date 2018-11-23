@@ -51,10 +51,10 @@ namespace Commuteasy
             Console.WriteLine("Dist: " + graphDijkstra.FromVisited(visited)[0]);
             Console.WriteLine("From: " + graphDijkstra.FromVisited(visited)[1]);
             Console.WriteLine("To: " + graphDijkstra.FromVisited(visited)[2]);*/
-            List<int> graphPath = graphDijkstra.ShortestPath(3, 5);
+            List<Node> graphPath = graphDijkstra.ShortestPath(node3, node5);
             Console.WriteLine("Path");
-            foreach(int vertex in graphPath){
-                Console.WriteLine(vertex);
+            foreach(Node vertex in graphPath){
+                Console.WriteLine(vertex.id);
             }
         }
     }

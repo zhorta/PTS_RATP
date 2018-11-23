@@ -9,11 +9,14 @@ namespace Commuteasy
         public Node predecessor;
         public int distToNode;
 
+
         public Node(int id)
         {
             this.id = id;
             neighbours = new Dictionary<int, int>();
             distToNode = 0;
+
+
 
         }
 
