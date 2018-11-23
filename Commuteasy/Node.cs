@@ -7,11 +7,13 @@ namespace Commuteasy
         public int id;
         public Dictionary<int, int> neighbours;
         public Node predecessor;
+        public int distToNode;
 
         public Node(int id)
         {
             this.id = id;
-            this.neighbours = new Dictionary<int, int>();
+            neighbours = new Dictionary<int, int>();
+            distToNode = 0;
 
         }
 

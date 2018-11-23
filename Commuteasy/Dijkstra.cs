@@ -60,16 +60,7 @@ namespace Commuteasy
             int nextVertex = -1;
 
             while(!reachedTheEnd){
-                for (int j = 0; j < graph.adjacencyMatrix.GetLength(0); j++)
-                {
-
-                    if (graph.adjacencyMatrix[currentVertex, j] < minDist && !visited.Contains(j) && j != currentVertex)
-                    {
-                        minDist = graph.adjacencyMatrix[currentVertex, j];
-                        nextVertex = j;
-                    }
-
-                }
+                
                 visited.Add(currentVertex);
                 int[] distFromVisited = FromVisited(visited); //index 0 = minDist, index 1 = selectedVertex, index 2 = destinationVertex
 
@@ -78,6 +69,13 @@ namespace Commuteasy
                     nextVertex = distFromVisited[2];
                     currentVertex = distFromVisited[1];
                 }
+
+
+                Console.WriteLine("Visited: ");
+                foreach(int vertex in visited){
+                    Console.Write(vertex + ", ");
+                }
+                Console.WriteLine();
 
 
                 Console.Write("Current vertex: " + currentVertex);
