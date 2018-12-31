@@ -1,7 +1,7 @@
 # PTS_RATP
 
 ## TEAM
-Zoé Horta & Anne-Sophie Jovinac
+Zoé Horta (zhorta) & Anne-Sophie Jovinac (JAnneSo)
 
 ## OBJECTIVE
 
