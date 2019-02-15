@@ -1,4 +1,4 @@
-from math import *
+import math
 from datetime import datetime
 
 
@@ -36,6 +36,7 @@ class Node_:
     coord_x = 0.0
     coord_y = 0.0
     coutTrajetEstime = 0.0
+    time_to_node_g = 0
 
     def __init__(self, stop_id, neighbours, coord_x, coord_y):
         self.stop_id = stop_id
@@ -56,7 +57,7 @@ class A_Star:
         y1 = current_node.coord_y
         x2 = goal_node.coord_x
         y2 = goal_node.coord_y
-        heuristic = trunc(sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)))
+        heuristic = math.trunc(math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)))
 
         return heuristic
     
@@ -82,7 +83,7 @@ class A_Star:
         #First, the matrix is filled with "infinite values"
         for i in range(len(nodes_list)):
             for j in range(len(nodes_list)):
-                matrix[i,j] = inf
+                matrix[i,j] = math.inf
 
         for node in nodes_list:
             for key, value in node.neighbours.items():
@@ -302,7 +303,7 @@ open_list = []
 closed_list = []
 goal = find_node_with_id(4024287)
 open_list.append(find_node_with_id(4024227))
-print(find_node_with_id(4024227).neighbours[find_node_with_id(4024229).stop_id][0])
+
 
 while len(open_list) != 0:
     best = astar.best_node(open_list)
@@ -322,8 +323,8 @@ while len(open_list) != 0:
                 open_list.remove(node)
         
         for neighbour in temp.neighbours:
+            Gy = astar.cost_G(closed_list, find_node_with_id(neighbour))
             Gx = astar.cost_G(closed_list, temp)
-            Gy = astar.cost_G(closed_list, neighbour)
             k = astar.cost(temp, neighbour)
             v = not astar.is_in_list(closed_list, neighbour)
             if v and not astar.is_in_list(open_list, neighbour) or Gy > Gx + k :
