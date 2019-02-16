@@ -32,16 +32,18 @@ class Node:
 
 class Node_:
     stop_id = 0
-    dist_to_node = 0
     coord_x = 0.0
     coord_y = 0.0
     coutTrajetEstime = 0.0
     time_to_node_g = 0
+    trip_id = 0
+    stop_name = ""
 
     def __init__(self, stop_id, neighbours, coord_x, coord_y):
         self.stop_id = stop_id
         self.neighbours = neighbours
-        dist_to_node = 0.0
+        time_to_node_g = 0
+        
         self.coord_x = coord_x
         self.coord_y = coord_y
     
@@ -62,14 +64,9 @@ class A_Star:
         return heuristic
     
     # Coût entre deux noeuds
-    # -------------------------------------------------------------------------
-    # def cost(self, adjacency_matrix, current_node, next_node):
-    #     indL = current_node.id
-    #     indC = next_node.id
-    #     return adjacency_matrix[indL - 1][indC - 1]
-    
-    def cost(self, current_node, next_node):
-        cost_value = current_node.neighbours[next_node.stop_id][0]
+    # -------------------------------------------------------------------------    
+    def cost(self, current_node, next_node_id):
+        cost_value = current_node.neighbours[next_node_id][0]
         return cost_value
 
     def display_nodes(self, nodes_list):
@@ -92,41 +89,8 @@ class A_Star:
         
         return matrix
 
-
-
-    def matrix3(self):
-        matrix = np.zeros((9,9))
-        l0 = [0, 1, 3, 6, 0, 0, 0, 0, 0]
-        l1 = [0, 0, 2, 0, 0, 0, 0, 0, 0]
-        l2 = [0, 0, 0, 0, 0, 2, 0, 0, 0]
-        l3 = [0, 0, 0, 0, 6, 0, 0, 0, 0]
-        l4 = [0, 0, 4, 0, 0, 0, 1, 3, 1]
-        l5 = [0, 0, 0, 0, 0, 0, 7, 0, 0]
-        l6 = [0, 0, 0, 0, 0, 0, 0, 4, 0]
-        l7 = [0, 0, 0, 0, 0, 0, 0, 0, 2]
-        l8 = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        matrix[0] = l0
-        matrix[1] = l1
-        matrix[2] = l2
-        matrix[3] = l3
-        matrix[4] = l4
-        matrix[5] = l5
-        matrix[6] = l6
-        matrix[7] = l7
-        matrix[8] = l8
-        return matrix
-
     # Calcul du coût du trajet du départ au noeud courant
     #-------------------------------------------------------------------------
-    # def cost_G(self, adjacency_matrix, liste_fermee, current_node):
-    #     result = 0.0
-    #     i = 0
-    #     while i < len(liste_fermee) - 1:
-    #         result += self.cost(adjacency_matrix, liste_fermee[i], liste_fermee[i+1])
-    #         i += 1
-    #     result += self.cost(adjacency_matrix, liste_fermee[i], current_node)
-    #     return result
-
     def cost_G(self, liste_fermee, current_node):
         result = 0.0
         i = 0
@@ -150,95 +114,18 @@ class A_Star:
         return result
     
     # Fonction qui vérifie que node est bien dans la liste
-    def is_in_list(self, nodes_list, node):
+    def is_in_list(self, nodes_list, find_node_id):
         result = False
+        
         for item in nodes_list:
-            if item.stop_id == node.stop_id:
-                result = True
+            if type(item) == int :
+                if item == find_node_id:
+                    result = True
+            if type(item) == Node_:
+                if item.stop_id == find_node_id:
+                    result = True
             
         return result
-
-
-# node9 = Node(9, 6, -1, [])
-# node8 = Node(8, 7, 1, [node9])
-# node7 = Node(7, 6, 4, [node8])
-# node6 = Node(6, 4, 5, [node7] )
-# node3 = Node(3, 2, 3.5,[node6] )
-# node5 = Node(5, 2, 0, [node3, node7, node8, node9])
-# node4 = Node(4, 0, 2, [node5] )
-# node2 = Node(2, 2, 7, [node3] )
-# node1 = Node(1, 0, 5, [node2, node3, node4])
-
-# astar = A_Star()
-# matrix = astar.matrix3()
-# open_list = []
-# closed_list = []
-# goal = node9
-# open_list.append(node1)
-
-# while len(open_list) != 0:
-#     best = astar.best_node(open_list)
-#     for node in open_list:
-#         if node == best:
-#             open_list.remove(node)
-    
-#     closed_list.append(best)
-
-#     if astar.is_in_list(closed_list, goal):
-#         open_list = []
-#     else:
-#         temp = closed_list[-1]
-
-#         for node in open_list:
-#             if not astar.is_in_list(temp.adjacent_nodes, node):
-#                 open_list.remove(node)
-        
-#         for i in range(len(temp.adjacent_nodes)):
-#             Gx = astar.cost_G(matrix, closed_list, temp)
-#             Gy = astar.cost_G(matrix, closed_list, temp.adjacent_nodes[i])
-#             k = astar.cost(matrix, temp, temp.adjacent_nodes[i])
-#             v = not astar.is_in_list(closed_list, temp.adjacent_nodes[i])
-#             if v and not astar.is_in_list(open_list, temp.adjacent_nodes[i]) or Gy > Gx + k :
-#                 g = Gx + k
-#                 temp.adjacent_nodes[i].coutdudepartG = g
-#                 temp.adjacent_nodes[i].coutTrajetEstime = g + astar.heuristic_value(temp.adjacent_nodes[i], goal)
-#                 print("g(y) = " + str(temp.adjacent_nodes[i].coutdudepartG))
-
-#                 open_list.append(temp.adjacent_nodes[i])
-
-
-# astar.display_nodes(closed_list)
-# print(closed_list[-1].coutdudepartG)
-
-# node0 = Node_(0,1234,{})
-# node1 = Node_(1, 3245, {})
-# node2 = Node_(2, 3245, {})
-# node3 = Node_(3, 3245, {})
-# node4 = Node_(4, 3245, {})
-# node5 = Node_(5, 3245, {})
-# node6 = Node_(6, 3245, {})
-# node0.add_neighbour(node1, 1)
-# node0.add_neighbour(node2, 2)
-# node0.add_neighbour(node3, 3)
-# node0.add_neighbour(node4, 7)
-# node1.add_neighbour(node0, 1)
-# node1.add_neighbour(node2, 4)
-# node2.add_neighbour(node0, 2)
-# node2.add_neighbour(node1, 4)
-# node2.add_neighbour(node6, 2)
-# node3.add_neighbour(node0, 3)
-# node4.add_neighbour(node0, 7)
-# node4.add_neighbour(node6, 4)
-# node4.add_neighbour(node5, 1)
-# node5.add_neighbour(node4, 1)
-# node6.add_neighbour(node2, 2)
-# node6.add_neighbour(node4, 4)
-
-# nodes = [node0, node1, node2, node3, node4, node5, node6]
-
-# astart = A_Star()
-# adj_matrix = astart.build_adj_matrix(nodes)
-# print(adj_matrix)
 
 stops = db.stops.find()
 nb_of_stops = db.stops.count()
@@ -251,7 +138,9 @@ db.stop_times.create_index([("stop_id", pymongo.ASCENDING)])
 db.stop_times.create_index([("trip_id", pymongo.ASCENDING)])
 db.stop_times.create_index([("stop_sequence", pymongo.ASCENDING)])
 db.stop_times.create_index([("arrival_time", pymongo.ASCENDING)])
-#db.stops.create_index([("stop_id", pymongo.ASCENDING)])
+db.transfers.create_index([("from_stop_id", pymongo.ASCENDING)])
+db.routes.create_index([("route_short_name", pymongo.ASCENDING)])
+db.stops.create_index([("stop_name", pymongo.ASCENDING)])
 
 nodes = []
 index = 1
@@ -260,13 +149,31 @@ for stop in stops:
     new_node_x = stop["stop_lon"]
     new_node_y = stop["stop_lat"]
     new_node = Node_(stop['stop_id'],{}, new_node_x, new_node_y)
+    new_node.stop_name = stop["stop_name"]
+    
+    # Adds the changes to the neighbours
+    # --------------------------------------
+    # correspondances = db.transfers.find({"from_stop_id": stop['stop_id']})
+    # correspondances_id = []
+    # correspondances_duration = []
+    # for correspondance in correspondances:
+    #     correspondances_id.append(correspondance["to_stop_id"])
+    #     correspondances_duration.append(correspondance["min_transfer_time"])
+    # for i in range(len(correspondances_id)):
+    #         new_node.add_neighbour(correspondances_id[i], correspondances_duration[i])
     try:
         new_node_info = db.stop_times.find_one({"stop_id": stop['stop_id']})
         new_node_trip_id = new_node_info["trip_id"]
+        new_node.trip_id = new_node_trip_id
+        
         new_node_stop_sequence = new_node_info["stop_sequence"]
+        
         
         voisin = db.stop_times.find_one({"trip_id": new_node_trip_id, "stop_sequence": new_node_stop_sequence + 1})
         voisin_stop_id = voisin["stop_id"]
+       
+    
+        
         
         # new_node_arrival_time = datetime.strptime(new_node_info["arrival_time"], '%H:%M:%S')
         # print(new_node_arrival_time)
@@ -275,7 +182,8 @@ for stop in stops:
         # diff = voisin_arrival_time - new_node_arrival_time
         # print(diff)
         
-        new_node.add_neighbour(voisin_stop_id, 1)# diff)
+        new_node.add_neighbour(voisin_stop_id, 60)# diff) 60 sec
+        
         
     except TypeError:
         pass
@@ -283,14 +191,6 @@ for stop in stops:
 
     
     nodes.append(new_node)
-
-# for node in nodes:
-#     print("node: ")
-#     print(node.stop_id)
-#     print(node.neighbours)
-#     print(node.coord_x)
-#     print(node.coord_y)
-    
 
 def find_node_with_id(id):
     for node in nodes:
@@ -301,11 +201,15 @@ def find_node_with_id(id):
 astar = A_Star()
 open_list = []
 closed_list = []
-goal = find_node_with_id(4024287)
-open_list.append(find_node_with_id(4024227))
+goal = find_node_with_id(1913) # La Défense (4024287) # Gare de Rueil 
+start = find_node_with_id(1713) # Gare de Rueil RER (4024278) # Dunant
+start.time_to_node_g = 0
+open_list.append(start)
+
 
 
 while len(open_list) != 0:
+    
     best = astar.best_node(open_list)
     for node in open_list:
         if node == best:
@@ -313,29 +217,43 @@ while len(open_list) != 0:
     
     closed_list.append(best)
 
-    if astar.is_in_list(closed_list, goal):
+    if astar.is_in_list(closed_list, goal.stop_id):
         open_list = []
     else:
         temp = closed_list[-1]
-
+        
         for node in open_list:
             if not astar.is_in_list(temp.neighbours, node):
                 open_list.remove(node)
         
         for neighbour in temp.neighbours:
-            Gy = astar.cost_G(closed_list, find_node_with_id(neighbour))
-            Gx = astar.cost_G(closed_list, temp)
+            Gx = closed_list[-1].time_to_node_g #astar.cost_G(closed_list, temp)
+            Gy = closed_list[-1].time_to_node_g + temp.neighbours[neighbour][0]
             k = astar.cost(temp, neighbour)
             v = not astar.is_in_list(closed_list, neighbour)
             if v and not astar.is_in_list(open_list, neighbour) or Gy > Gx + k :
                 g = Gx + k
-                neighbour.coutdudepartG = g
-                neighbour.coutTrajetEstime = g + astar.heuristic_value(neighbour, goal)
-                print("g(y) = " + str(neighbour.coutdudepartG))
+                find_node_with_id(neighbour).time_to_node_g = g
+                find_node_with_id(neighbour).coutTrajetEstime = g + astar.heuristic_value(find_node_with_id(neighbour), goal)
+                print("g(y) = " + str(find_node_with_id(neighbour).time_to_node_g))
 
-                open_list.append(neighbour)
+                open_list.append(find_node_with_id(neighbour))
+    
 
 
 astar.display_nodes(closed_list)
-print(closed_list[-1].coutdudepartG)
+print(closed_list[-1].time_to_node_g)
+print("Route: ")
+for stop in closed_list:
+    name = db.stops.find_one({"stop_id": stop.stop_id})["stop_name"]
+    route = db.trips.find_one({"trip_id": stop.trip_id})["route_id"]
+    line = db.routes.find_one({"route_id": route})["route_short_name"]
+    print("id : " + str(stop.stop_id))
+    print("name : " + name)
+    print("line : " + str(line))
+print("END")
+
+# new_node_route = db.trips.find_one({"trip_id": new_node_trip_id})["route_id"]
+#         new_node_line = db.routes.find_one({"route_id": new_node_route})["route_short_name"]
+#         new_node.line = new_node_line
 
