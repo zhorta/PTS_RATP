@@ -16,7 +16,7 @@ from pymongo import MongoClient
 import numpy as np
 
 import gmaps
-gmaps.configure(api_key='AIzaSyAbKXTRT3T7BxF9CNRuKJoyi8TdRKoLUGE')
+gmaps.configure(api_key='YOUR_API_KEY')
 
 client = MongoClient()
 db = client.commuteasy
