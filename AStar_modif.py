@@ -8,9 +8,12 @@ from pymongo import MongoClient
 import numpy as np
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import gmaps
 gmaps.configure(api_key='YOUR_API_KEY')
 
+=======
+>>>>>>> parent of c0b0fc5... Update AStar_modif.py
 =======
 >>>>>>> parent of c0b0fc5... Update AStar_modif.py
 client = MongoClient()
