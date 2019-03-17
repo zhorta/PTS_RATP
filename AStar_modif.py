@@ -15,8 +15,8 @@ from pymongo import MongoClient
 
 import numpy as np
 
-import gmaps
-gmaps.configure(api_key='YOUR_API_KEY')
+#import gmaps
+#gmaps.configure(api_key='YOUR_API_KEY')
 
 client = MongoClient()
 db = client.commuteasy
@@ -53,7 +53,7 @@ class A_Star:
         y1 = current_node.coord_y
         x2 = goal_node.coord_x
         y2 = goal_node.coord_y
-        heuristic = math.trunc(math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)))
+        heuristic = math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2))
 
         return heuristic
     
@@ -184,6 +184,8 @@ for stop in stops:
         diff = (voisin_arrival_time - new_node_arrival_time).total_seconds()
         #print(diff)
         
+        
+
         new_node.add_neighbour(voisin_stop_id, diff)
         
         
@@ -199,19 +201,54 @@ def find_node_with_id(id):
         if node.stop_id == id:
             return node
 
-        
-def find_node_with_name(name):
-    nodes_list = list()
-    for node in nodes:
-        if node.stop_name == name:
-            nodes_list.append(node)
-    return nodes_list
-    
 astar = A_Star()
+
+#CHANGE THE VALUE OF THE ARRIVAL/DEPARTURE TIME OF STOP 4024233
+#result = db.stop_times.update_one({"trip_id": 10027945480941133, "stop_id": 4024233}, {"$set": {"arrival_time": "20:06:00", "departure_time": "20:06:00"}})
+
+stops_found = db.stop_times.find({"trip_id": 10027945480941133})
+
+for stop in stops_found:
+    print(stop["stop_id"])
+    print(stop["stop_sequence"])
+    print(stop["arrival_time"])
+    print(stop["departure_time"])
+    print("\n")
+def find_node_with_name(nameDeparture, nameArrival):
+    nodes_list = list()
+    min_node_heuristic = math.inf
+    arrivalNode = Node_(0, {}, {}, 0.0, 0.0)
+    selected_node = Node_(0, {}, {}, 0.0, 0.0)
+    for node in nodes:
+        if node.stop_name == nameDeparture:
+            nodes_list.append(node)
+    for node in nodes:
+        if node.stop_name == nameArrival:
+            arrivalNode = node
+            break
+    for node in nodes_list:
+
+        node_heuristic = astar.heuristic_value(find_node_with_id(next(iter(node.neighbours))), arrivalNode)
+        if node_heuristic < min_node_heuristic:
+            min_node_heuristic = node_heuristic
+            selected_node = node
+    return (selected_node, arrivalNode)
+
+find_node_with_name_node = find_node_with_name("DUNANT", "RUEIL-MALMAISON RER")
+    
+
 open_list = []
 closed_list = []
-goal = find_node_with_id(4035022) # 1913 La Défense (4024287) # Gare de Rueil 
-start = find_node_with_id(4024278) # Dunant (1713) # Gare de Rueil RER 
+
+
+from_input = input("From: ")
+to_input = input("To: ")
+start = find_node_with_name(from_input, to_input)[0]
+goal = find_node_with_name(from_input, to_input)[1]
+
+
+#goal = find_node_with_id(1713) # 1913 La Défense (4024287) # Gare de Rueil 
+#start = find_node_with_id(4024278) # Dunant (1713) # Gare de Rueil RER 
 start.time_to_node_g = 0
 open_list.append(start)
 
@@ -229,8 +266,11 @@ def closest_transfer_neighbour(node):
             #print("Gy: " + str(Gy))
             k = astar.cost_transfers(node, transfer)
             #print("k: " + str(k))
+            #print(next(iter(find_node_with_id(transfer).neighbours))) 
+            #USE THE HEURISTIC
+            heuristic_transfer_neighbour = astar.heuristic_value(find_node_with_id(next(iter(find_node_with_id(transfer).neighbours))), goal)
             transfers_distances.setdefault(transfer,[]).append(Gy)
-            mini = (min(transfers_distances, key=transfers_distances.get), transfers_distances[min(transfers_distances, key=transfers_distances.get)][0], Gx)
+            mini = (min(transfers_distances, key=transfers_distances.get), transfers_distances[min(transfers_distances, key=transfers_distances.get)][0], Gx, heuristic_transfer_neighbour)
     return mini
 
 
@@ -244,7 +284,7 @@ while len(open_list) != 0:
     
     closed_list.append(best)
 
-    if node.stop_id == goal.stop_id:
+    if node.stop_name == goal.stop_name:
         break
 
     if astar.is_in_list(closed_list, goal.stop_id):
@@ -259,7 +299,7 @@ while len(open_list) != 0:
         if len(temp.neighbours) != 0:
             for neighbour in temp.neighbours:
                 min_dist_transfer_tuple = closest_transfer_neighbour(temp)
-
+                
                 min_dist_transfer_tuple_two = ()
             
             
@@ -267,10 +307,17 @@ while len(open_list) != 0:
                 Gy = closed_list[-1].time_to_node_g + temp.neighbours[neighbour][0]
             
                 neighbour_tuple = (neighbour, Gy)
+                neighbour_heuristic = astar.heuristic_value(find_node_with_id(neighbour), goal)
                 min_tuple = ()
-                if len(min_dist_transfer_tuple) == 2:
+                if len(min_dist_transfer_tuple) == 3:
                     min_dist_transfer_tuple_two = (min_dist_transfer_tuple[0], min_dist_transfer_tuple[1])
-                    min_tuple = min(neighbour_tuple, min_dist_transfer_tuple_two)
+                    if min(neighbour_tuple[1], min_dist_transfer_tuple_two[1]) == neighbour_tuple[1]:
+                        min_tuple = neighbour_tuple
+                    
+                    else:
+                        min_tuple = min_dist_transfer_tuple_two
+                    
+                    #min_tuple = min(neighbour_tuple, min_dist_transfer_tuple_two)
             
                 k = 0
                 Gx = 0
@@ -325,8 +372,7 @@ while len(open_list) != 0:
 
 astar.display_nodes(closed_list)
 
-#test_input = input("From: ")
-#list_test_stop_name = find_node_with_name(test_input)
+
 
 
 stops_dictionaries_list = []
@@ -359,32 +405,33 @@ for stop in closed_list:
         line = db.routes.find_one({"route_id": route})["route_short_name"]
         print("line : " + str(line))
     print("id : " + str(stop.stop_id))
-    print("name : " + name)
+    print("name : " + name + "\n")
+    print ("time :" + str(stop.time_to_node_g))
         
 print("END")    
     
 
-stops_locations = [stop['coordinates'] for stop in stops_dictionaries_list]
-info_box_template = """
-<dl>
-<dt>Name</dt><dd>{name}</dd>
-<dt>Line</dt><dd>{line}</dd>
-<dt>Stop number </dt><dd>{position}</dd>
-</dl>
-"""
-stops_info = [info_box_template.format(**stop) for stop in stops_dictionaries_list]
-marker_layer = gmaps.marker_layer(stops_locations, info_box_content=stops_info)
-fig = gmaps.figure()
-fig.add_layer(marker_layer)
+# stops_locations = [stop['coordinates'] for stop in stops_dictionaries_list]
+# info_box_template = """
+# <dl>
+# <dt>Name</dt><dd>{name}</dd>
+# <dt>Line</dt><dd>{line}</dd>
+# <dt>Stop number </dt><dd>{position}</dd>
+# </dl>
+# """
+# stops_info = [info_box_template.format(**stop) for stop in stops_dictionaries_list]
+# marker_layer = gmaps.marker_layer(stops_locations, info_box_content=stops_info)
+# fig = gmaps.figure()
+# fig.add_layer(marker_layer)
 
-#final_route = gmaps.directions_layer(stops_coor)
+# #final_route = gmaps.directions_layer(stops_coor)
 
-#for i in range(len(stops_coor)-1):
-#    fig.add_layer(gmaps.directions_layer(stops_coor[i], stops_coor[i+1]))
+# #for i in range(len(stops_coor)-1):
+# #    fig.add_layer(gmaps.directions_layer(stops_coor[i], stops_coor[i+1]))
 
 
-#fig.add_layer(final_route)
-fig
+# #fig.add_layer(final_route)
+# fig
 
 
 
